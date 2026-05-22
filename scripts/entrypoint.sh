@@ -19,18 +19,19 @@ CONFIG_TARGET="/var/www/html/config.php"
 if [ -f "${CONFIG_BACKUP}" ] && [ ! -f "${CONFIG_TARGET}" ]; then
     echo "[entrypoint] Restoring config.php from moodledata..."
     cp "${CONFIG_BACKUP}" "${CONFIG_TARGET}"
-    chown www-data:www-data "${CONFIG_TARGET}"
 fi
 
 if [ ! -f "${CONFIG_TARGET}" ]; then
     echo "[entrypoint] Running IOMAD installer..."
     /bin/bash /scripts/install-iomad.sh
-    chown www-data:www-data "${CONFIG_TARGET}"
     cp "${CONFIG_TARGET}" "${CONFIG_BACKUP}"
     echo "[entrypoint] Installation complete."
 else
     echo "[entrypoint] IOMAD already installed, skipping."
 fi
+
+chown www-data:www-data "${CONFIG_TARGET}"
+chmod 0644 "${CONFIG_TARGET}"
 
 SEED_FLAG="/var/moodledata/.seeded"
 if [ ! -f "${SEED_FLAG}" ]; then
