@@ -46,6 +46,7 @@ RUN mkdir -p /var/moodledata && chown www-data:www-data /var/moodledata
 COPY plugin/block_iomad_claude /var/www/html/blocks/iomad_claude
 RUN chown -R www-data:www-data /var/www/html/blocks/iomad_claude
 
+COPY seed /seed
 COPY scripts/entrypoint.sh /scripts/entrypoint.sh
 COPY scripts/install-iomad.sh /scripts/install-iomad.sh
 RUN chmod +x /scripts/entrypoint.sh /scripts/install-iomad.sh
