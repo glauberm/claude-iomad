@@ -52,6 +52,12 @@ class external extends external_api {
         $tools  = new iomad_tools($companyid);
         $client = new claude_client($apikey, $model, $tools);
 
-        return $client->answer($question, $companyid);
+        try {
+            return $client->answer($question, $companyid);
+        } catch (claude_overloaded_exception $e) {
+            return '⚠️ The AI service is currently overloaded. Please wait a moment and try again.';
+        } catch (\moodle_exception $e) {
+            return '⚠️ ' . $e->getMessage();
+        }
     }
 }

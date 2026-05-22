@@ -3,6 +3,12 @@ namespace block_iomad_claude;
 
 defined('MOODLE_INTERNAL') || die();
 
+class claude_overloaded_exception extends \moodle_exception {
+    public function __construct() {
+        parent::__construct('error', 'block_iomad_claude', '', null, 'Anthropic API overloaded after retries');
+    }
+}
+
 class claude_client {
 
     private const API_URL = 'https://api.anthropic.com/v1/messages';
@@ -93,7 +99,7 @@ class claude_client {
             'No answer returned after ' . self::MAX_TOOL_ROUNDS . ' tool rounds');
     }
 
-    private function post(array $payload): array {
+    private function post(array $payload, int $attempt = 0): array {
         $ch = curl_init(self::API_URL);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
@@ -119,6 +125,16 @@ class claude_client {
         }
 
         $data = json_decode($body, true);
+
+        // Retry on transient errors up to 3 times with exponential backoff.
+        if (in_array($http, [529, 503, 500]) && $attempt < 3) {
+            sleep((int) round(2 ** $attempt));
+            return $this->post($payload, $attempt + 1);
+        }
+
+        if (in_array($http, [529, 503])) {
+            throw new claude_overloaded_exception();
+        }
 
         if ($http !== 200) {
             $msg = $data['error']['message'] ?? $body;
