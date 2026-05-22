@@ -41,5 +41,8 @@ else
     echo "[entrypoint] Already seeded, skipping."
 fi
 
+echo "[entrypoint] Configuring Apache MPM..."
+a2dismod mpm_event mpm_worker 2>/dev/null; a2enmod mpm_prefork
+
 echo "[entrypoint] Starting Apache..."
 exec apache2-foreground

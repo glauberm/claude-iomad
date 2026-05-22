@@ -22,9 +22,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     soap \
     zip \
     sodium \
-  && a2dismod mpm_event mpm_worker 2>/dev/null || true \
-  && a2enmod mpm_prefork rewrite \
+  && a2enmod rewrite \
   && rm -rf /var/lib/apt/lists/*
+
+# Ensure only mpm_prefork is active (required for mod_php)
+RUN rm -f /etc/apache2/mods-enabled/mpm_event.conf \
+          /etc/apache2/mods-enabled/mpm_event.load \
+          /etc/apache2/mods-enabled/mpm_worker.conf \
+          /etc/apache2/mods-enabled/mpm_worker.load \
+  && a2enmod mpm_prefork
 
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/moodle.ini
 COPY docker/php/moodle.conf /etc/apache2/sites-available/000-default.conf
