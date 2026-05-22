@@ -1,0 +1,48 @@
+services:
+
+  iomad:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: iomad_web
+    ports:
+      - "8080:80"
+    environment:
+      MOODLE_DB_HOST: db
+      MOODLE_DB_NAME: ${MYSQL_DATABASE}
+      MOODLE_DB_USER: ${MYSQL_USER}
+      MOODLE_DB_PASS: ${MYSQL_PASSWORD}
+      MOODLE_WWWROOT: http://localhost:8080
+      MOODLE_ADMIN_USER: admin
+      MOODLE_ADMIN_PASS: ${MOODLE_ADMIN_PASS}
+      MOODLE_ADMIN_EMAIL: admin@example.com
+      MOODLE_DATAROOT: /var/moodledata
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    volumes:
+      - moodledata:/var/moodledata
+      - ./scripts:/scripts:ro
+      - ./seed:/seed:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    container_name: iomad_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/moodle.cnf:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  moodledata:
+  mysql_data:

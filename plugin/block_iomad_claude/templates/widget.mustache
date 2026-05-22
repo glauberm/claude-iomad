@@ -1,0 +1,21 @@
+<div class="block-iomad-claude" id="block-iomad-claude-{{blockid}}">
+    <div class="claude-input-row">
+        <textarea
+            class="claude-question form-control"
+            rows="3"
+            placeholder="{{# str }} ask_placeholder, block_iomad_claude {{/ str }}"
+        ></textarea>
+    </div>
+    <div class="claude-actions mt-2">
+        <button class="claude-submit btn btn-primary btn-sm">
+            {{# str }} submit, block_iomad_claude {{/ str }}
+        </button>
+    </div>
+    <div class="claude-response mt-3" aria-live="polite" role="status"></div>
+</div>
+
+{{#js}}
+require(['block_iomad_claude/widget'], function(Widget) {
+    Widget.init('{{blockid}}');
+});
+{{/js}}
