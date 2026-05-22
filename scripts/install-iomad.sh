@@ -12,8 +12,8 @@ php /var/www/html/admin/cli/install.php \
     --dbpass="${MOODLE_DB_PASS}" \
     --dbport="${MOODLE_DB_PORT:-3306}" \
     --prefix=mdl_ \
-    --fullname="IOMAD Demo Site" \
-    --shortname="iomad-demo" \
+    --fullname="Claude IOMAD" \
+    --shortname="claude-iomad" \
     --adminuser="${MOODLE_ADMIN_USER}" \
     --adminpass="${MOODLE_ADMIN_PASS}" \
     --adminemail="${MOODLE_ADMIN_EMAIL}" \
